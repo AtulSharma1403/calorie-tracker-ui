@@ -1,0 +1,18 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { UserListComponentComponent } from './user-list-component/user-list-component.component';
+import { UserDetailsComponentComponent } from './user-details-component/user-details-component.component';
+import { SignupComponentComponent } from './signup-component/signup-component.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/sign-up', pathMatch: 'full' },
+  { path: 'sign-up', component: SignupComponentComponent },
+  { path: 'users', component: UserListComponentComponent },
+  { path: 'users/:id', component: UserDetailsComponentComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
