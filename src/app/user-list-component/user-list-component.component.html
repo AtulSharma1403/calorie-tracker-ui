@@ -1,1 +1,55 @@
-<p>userlist-component works!</p>
+<div class="container-fluid min-vh-100 d-flex flex-column p-0" style="background:#f5f5f5;">
+  <!-- Success Alert -->
+  <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
+       role="alert" *ngIf="showSuccessAlert" style="z-index: 9999; max-width: 500px;">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="showSuccessAlert = false" aria-label="Close"></button>
+  </div>
+
+  <app-header></app-header>
+  
+  <div class="container flex-grow-1 my-5">
+    <h2 class="mb-4" style="color:#00a8e8; font-size:2rem;">User List</h2>
+    
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead style="background:#f5f5f5;">
+          <tr>
+            <th class="fw-bold">Name</th>
+            <th class="fw-bold">Weight</th>
+            <th class="fw-bold">Height</th>
+            <th class="fw-bold">Gender</th>
+            <th class="fw-bold">Age</th>
+            <th class="fw-bold">BMR</th>
+            <th class="fw-bold">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.name }}</td>
+            <td>{{ user.weight }}</td>
+            <td>{{ user.height }}</td>
+            <td>{{ user.gender }}</td>
+            <td>{{ user.age }}</td>
+            <td class="fw-bold">{{ user.bmr }}</td>
+            <td>
+              <button class="btn me-2" style="background:#bcbcbc; border:none; color:#fff; font-weight:500;" (click)="viewUserData(user)">View</button>
+              <button class="btn text-white" style="background:#00a8e8; border:none; font-weight:500;" (click)="openModal(user)">Add Data</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>
+<!-- Food Activity Modal -->
+<app-food-activity-modal 
+  [show]="showModal" 
+  [userId]="selectedUser?._id" 
+  (close)="closeModal()" 
+  (save)="saveData($event)"
+  (successNotification)="handleSuccess($event)">
+</app-food-activity-modal>
+
+

@@ -1,1 +1,165 @@
-<p>user-details-component works!</p>
+<app-header></app-header>
+
+<div class="d-flex flex-column min-vh-100">
+  <!-- Success Alert -->
+  <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
+       role="alert" *ngIf="showSuccessAlert" style="z-index: 9999; max-width: 500px;">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="showSuccessAlert = false" aria-label="Close"></button>
+  </div>
+
+  <div class="container mt-4 flex-grow-1">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="d-flex align-items-center">
+          <h2 class="text-primary mb-0">{{ userName }}</h2>
+        </div>
+      </div>
+      <div class="col-md-6 text-end">
+        <button class="btn btn-primary" (click)="addData()">Add Food and Activity Data</button>
+      </div>
+    </div>
+
+    <!-- Date Selection -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="date" class="form-control" placeholder="dd/MM/yyyy" (change)="onDateChange($event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Data and Activity Data -->
+    <div class="row">
+      <!-- Food Data -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Food Data</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date</th>
+                    <th>Meal Type</th>
+                    <th>Food Group</th>
+                    <th>Serving</th>
+                    <th>Calorie In</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let food of foodData">
+                    <td>{{ food.date | date:'dd/MM/yy' }}</td>
+                    <td>{{ food.mealType }}</td>
+                    <td>{{ food.foodGroup }}</td>
+                    <td>{{ food.serving }}</td>
+                    <td>{{ food.calorie }}</td>
+                  </tr>
+                  <tr *ngIf="!foodData || foodData.length === 0">
+                    <td colspan="5" class="text-center py-3">No records found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Data -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Activity Data</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>MET Value</th>
+                    <th>Duration</th>
+                    <th>Calorie Out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let activity of activityData">
+                    <td>{{ activity.date | date:'dd/MM/yy' }}</td>
+                    <td>{{ activity.activityName }}</td>
+                    <td>{{ activity.activityDescription }}</td>
+                    <td>{{ activity.metValue }}</td>
+                    <td>{{ activity.duration }}</td>
+                    <td>{{ activity.calorie }}</td>
+                  </tr>
+                  <tr *ngIf="!activityData || activityData.length === 0">
+                    <td colspan="6" class="text-center py-3">No records found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Net Calorie -->
+    <div class="row">
+      <div class="col-md-6 offset-md-6">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Net Calorie</h5>
+          </div>
+          <div class="card-body">
+            <div class="row border-bottom py-2">
+              <div class="col-6">
+                <strong>BMR:</strong>
+              </div>
+              <div class="col-6 text-end">
+                {{ calorieStats.bmr }}
+              </div>
+            </div>
+            <div class="row border-bottom py-2">
+              <div class="col-6">
+                <strong>Food:</strong>
+              </div>
+              <div class="col-6 text-end">
+                +{{ calorieStats.food }}
+              </div>
+            </div>
+            <div class="row border-bottom py-2">
+              <div class="col-6">
+                <strong>Activity:</strong>
+              </div>
+              <div class="col-6 text-end">
+                {{ calorieStats.activity }}
+              </div>
+            </div>
+            <div class="row py-2 bg-secondary text-white">
+              <div class="col-6">
+                <strong>Net Calorie:</strong>
+              </div>
+              <div class="col-6 text-end">
+                {{ calorieStats.netCalorie }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-footer class="mt-auto"></app-footer>
+</div>
+
+<!-- Food Activity Modal -->
+<app-food-activity-modal 
+  [show]="showModal" 
+  [userId]="userId" 
+  (close)="closeModal()" 
+  (save)="saveData($event)"
+  (successNotification)="handleSuccess($event)">
+</app-food-activity-modal>

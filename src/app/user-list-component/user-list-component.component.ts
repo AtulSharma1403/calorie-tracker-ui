@@ -1,29 +1,40 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-declare var window: any; // Add this at the top if you get TS errors
+import { RouterModule, Router } from '@angular/router';
+import { FoodActivityModalComponent } from '../shared/food-activity-modal/food-activity-modal.component';
+import { HeaderComponent } from '../shared/header/header.component';
+import { FooterComponent } from '../shared/footer/footer.component';
 
 @Component({
   selector: 'app-user-list-component',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FoodActivityModalComponent, HeaderComponent, FooterComponent],
   templateUrl: './user-list-component.component.html',
   styleUrls: ['./user-list-component.component.scss']
 })
 export class UserListComponentComponent implements OnInit {
+  @ViewChild(FoodActivityModalComponent) foodActivityModal!: FoodActivityModalComponent;
+  
+  showModal: boolean = false;
+  selectedUser: any = null;
   users: any[] = [];
   activities: any[] = [];
   specificMotions: any[] = [];
   selectedActivity: any = null;
   selectedMotion: any = null;
+  showSuccessAlert: boolean = false;
+  successMessage: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient, 
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:3000/api/users').subscribe(
+    this.http.get<any[]>('https://calorie-tracker-bff.onrender.com/api/users').subscribe(
       (data) => {
+        debugger
         this.users = data;
       },
       (error) => {
@@ -55,23 +66,34 @@ export class UserListComponentComponent implements OnInit {
     ];
   }
 
-  onSave(data: any) {
-    console.log('Saved data:', data);
-    // Handle the saved data here
-    // You might want to:
-    // 1. Add it to your table
-    // 2. Send it to your backend
-    // 3. Update your local state
+  openModal(user: any): void {
+    this.selectedUser = user;
+    this.showModal = true;
   }
 
-  onClose() {
-    console.log('Modal closed');
-    // Handle modal close if needed
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  saveData(data: any): void {
+    console.log('Saved data (legacy method):', data);
+    // Keep for backward compatibility
+  }
+  
+  // Handle success notifications from the modal
+  handleSuccess(event: {message: string}): void {
+    this.showSuccessAlert = true;
+    this.successMessage = event.message;
+    setTimeout(() => {
+      this.showSuccessAlert = false;
+    }, 3000);
+    
+    this.showModal = false;
   }
 
   onActivityChange() {
     if (this.selectedActivity) {
-      this.http.get<any[]>(`http://localhost:3000/api/activities/${this.selectedActivity}`).subscribe(
+      this.http.get<any[]>(`https://calorie-tracker-bff.onrender.com/api/activities/${this.selectedActivity}`).subscribe(
         (data) => {
           this.specificMotions = data;
           this.selectedMotion = null;
@@ -88,7 +110,12 @@ export class UserListComponentComponent implements OnInit {
     }
   }
 
-  onMotionChange() {
-    // METs will be set automatically via binding
+  viewUserData(user: any): void {
+    if (user && user._id) {
+      this.router.navigate(['/user-data', user._id]);
+      console.log(`Navigating to /user-data/${user._id}`);
+    } else {
+      console.error('User ID is undefined or null');
+    }
   }
 }

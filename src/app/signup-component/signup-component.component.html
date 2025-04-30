@@ -1,15 +1,7 @@
 <!-- <p>signup-component works!</p> -->
 
 <div class="container-fluid min-vh-100 d-flex flex-column p-0" style="background:#f5f5f5;">
-  <header class="bg-white py-3 shadow-sm">
-      <div class="container">
-          <div class="logo">
-              <a href="#" class="text-decoration-none">
-                  <img src="assets/logo.png" alt="Logo" class="img-fluid" style="max-height:48px;">
-              </a>
-          </div>
-      </div>
-  </header>
+  <app-header></app-header>
   <div class="container flex-grow-1 d-flex align-items-center justify-content-center">
       <div class="row w-100 justify-content-center my-5">
           <div class="col-md-10 col-lg-8 col-xl-6">
@@ -26,7 +18,7 @@
                           </div>
                           <div class="mb-3">
                               <label class="form-label">Weight</label>
-                              <input type="text" class="form-control" placeholder="Weight" formControlName="weight">
+                              <input type="number" class="form-control" placeholder="Weight" formControlName="weight">
                               <div class="text-danger" *ngIf="hasError('weight')">
                                   Weight is required and must be a number
                               </div>
@@ -51,7 +43,7 @@
                           </div>
                           <div class="mb-3">
                               <label class="form-label">Age</label>
-                              <input type="date" class="form-control" placeholder="mm/dd/yyyy" formControlName="age">
+                              <input type="number" class="form-control" placeholder="age" formControlName="age">
                           </div>
                           <div class="text-end">
                               <button type="button" class="btn btn-primary px-4" (click)="navigateToUserList()">Sign Up</button>
@@ -62,9 +54,5 @@
           </div>
       </div>
   </div>
-  <footer class="bg-dark py-3 mt-auto">
-      <div class="container text-center">
-          <p class="mb-0 text-white small">2022 LMD Consulting, LLC , All Rights Reserved</p>
-      </div>
-  </footer>
+  <app-footer></app-footer>
 </div>

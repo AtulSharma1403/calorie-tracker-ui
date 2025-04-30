@@ -1,0 +1,134 @@
+<div class="modal-overlay" *ngIf="show">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+
+      <div class="modal-header d-block p-0">
+        <div class="d-flex justify-content-between align-items-center px-3 pt-3">
+          <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <ul class="nav nav-tabs w-100 mt-2">
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'food'" (click)="setActiveTab('food')">Add Food</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'activity'" (click)="setActiveTab('activity')">Add Activity</a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="modal-body" *ngIf="activeTab === 'food'">
+        <div class="form-group mb-3">
+          <label class="form-label">Select Date</label>
+          <div class="input-group">
+            <input type="date" class="form-control" [(ngModel)]="foodData.date">
+            <span class="input-group-text">
+              <i class="bi bi-calendar"></i>
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Select Food Group</label>
+          <select class="form-select" [(ngModel)]="foodData.foodGroup" (ngModelChange)="onFoodGroupChange()">
+            <option value="">-- Select Food Group --</option>
+            <option *ngFor="let group of foods" [value]="group">{{group}}</option>
+          </select>
+          <small class="form-text text-muted">Select a food group to filter food options</small>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Select Food Name <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="foodData.foodName" required>
+            <option value="">-- Select Food --</option>
+            <option *ngFor="let food of foodNames" [value]="food.name">{{food.name}}</option>
+          </select>
+          <small class="form-text text-muted">Select the food item you consumed</small>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Select Meal Type <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="foodData.mealType" required>
+            <option value="">-- Select Meal Type --</option>
+            <option>Breakfast</option>
+            <option>Lunch</option>
+            <option>Dinner</option>
+            <option>Snacks</option>
+          </select>
+          <small class="form-text text-muted">Specify when this food was consumed</small>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Serving</label>
+          <input type="text" class="form-control" placeholder="Serving" [(ngModel)]="foodData.serving">
+        </div>
+      </div>
+      
+      <div class="modal-body" *ngIf="activeTab === 'activity'">
+        <div class="form-group mb-3">
+          <label class="form-label">Select Date</label>
+          <div class="input-group">
+            <input type="date" class="form-control" [(ngModel)]="activityData.date">
+            <span class="input-group-text">
+              <i class="bi bi-calendar"></i>
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Activity Name <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="activityData.activityName" (ngModelChange)="onActivityChange()" required>
+            <option value="">-- Select Activity --</option>
+            <option *ngFor="let activity of activities" [value]="activity">{{activity}}</option>
+          </select>
+          <small class="form-text text-muted">Select the type of activity performed</small>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Specific Motion <span class="text-danger">*</span></label>
+          <select class="form-select" [(ngModel)]="activityData.specificMotion" (ngModelChange)="onSpecificMotionChange()" required>
+            <option value="">-- Select Motion --</option>
+            <option *ngFor="let motion of specificMotions" [value]="motion['SPECIFIC MOTION']">{{motion['SPECIFIC MOTION']}}</option>
+          </select>
+          <small class="form-text text-muted">Specify the exact motion performed</small>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Activity Description</label>
+          <textarea class="form-control" rows="3" placeholder="Description" [(ngModel)]="activityData.description"></textarea>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">MET Value</label>
+          <input type="text" class="form-control" placeholder="Value" [(ngModel)]="activityData.metValue" readonly>
+        </div>
+        
+        <div class="form-group mb-3">
+          <label class="form-label">Activity Duration <span class="text-danger">*</span></label>
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="input-group">
+                <input type="number" min="0" class="form-control" placeholder="Hours" [(ngModel)]="activityData.durationHours" required>
+                <span class="input-group-text">hrs</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="input-group">
+                <input type="number" min="0" max="59" class="form-control" placeholder="Minutes" [(ngModel)]="activityData.durationMinutes" required>
+                <span class="input-group-text">min</span>
+              </div>
+            </div>
+          </div>
+          <small class="form-text text-muted">Enter the total time spent on this activity</small>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" *ngIf="activeTab === 'food'" (click)="saveFood()">Save Food</button>
+        <button type="button" class="btn btn-primary" *ngIf="activeTab === 'activity'" (click)="saveActivity()">Save Activity</button>
+      </div>
+    </div>
+  </div>
+</div> 
