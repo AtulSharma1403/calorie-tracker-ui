@@ -14,6 +14,7 @@ import { FooterComponent } from '../shared/footer/footer.component';
   styleUrls: ['./signup-component.component.scss']
 })
 export class SignupComponentComponent {
+  isLoading = false;
   signupForm = this.fb.group({
     name: ['', [Validators.required]],
     weight: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
@@ -26,6 +27,7 @@ export class SignupComponentComponent {
 
   navigateToUserList() {
     if (this.signupForm.valid) {
+      this.isLoading = true;
       this.saveUser();
     } else {
       Object.keys(this.signupForm.controls).forEach(key => {
@@ -37,15 +39,15 @@ export class SignupComponentComponent {
 
   saveUser() {
     const userData = this.signupForm.value;
-    
     this.http.post('https://calorie-tracker-bff.onrender.com/api/users', userData).subscribe(
       (response) => {
         console.log('User saved successfully:', response);
+        this.isLoading = false;
         this.router.navigate(['/user-list']);
       },
       (error) => {
         console.error('Failed to save user:', error);
-        alert('Failed to save user data. Please try again.');
+        this.isLoading = false;
       }
     );
   }

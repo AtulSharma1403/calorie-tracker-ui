@@ -17,11 +17,13 @@ import { FooterComponent } from '../shared/footer/footer.component';
 export class UserDetailsComponentComponent implements OnInit {
   currentDate = new Date();
   displayDate = '6/27/2022';
-  userName = 'James';
+  userName = '';
   userId: string = '';
   selectedDate: string = '';
   userBmr: number = 0;
   isLoading: boolean = true;
+  isFoodLoading: boolean = true;
+  isActivityLoading: boolean = true;
   showModal: boolean = false;
   showSuccessAlert: boolean = false;
   successMessage: string = '';
@@ -46,6 +48,9 @@ export class UserDetailsComponentComponent implements OnInit {
       this.userId = params['userId'];
       this.selectedDate = params['date'];
       this.displayDate = this.selectedDate || this.displayDate;
+      this.isLoading = true;
+      this.isFoodLoading = true;
+      this.isActivityLoading = true;
       this.fetchUserData();
       this.fetchFoodData();
       this.fetchActivityData();
@@ -65,27 +70,41 @@ export class UserDetailsComponentComponent implements OnInit {
   }
 
   fetchFoodData(): void {
+    this.isFoodLoading = true;
     this.http.get<any[]>(`https://calorie-tracker-bff.onrender.com/api/foods/userfood?userId=${this.userId}&date=${this.selectedDate}`).subscribe(
       (data) => {
         this.foodData = data;
+        this.isFoodLoading = false;
         this.updateCalorieStats();
+        this.updateLoadingState();
       },
       (error) => {
         console.error('Failed to fetch food data:', error);
+        this.isFoodLoading = false;
+        this.updateLoadingState();
       }
     );
   }
 
   fetchActivityData(): void {
+    this.isActivityLoading = true;
     this.http.get<any[]>(`https://calorie-tracker-bff.onrender.com/api/activities/useractivity?userId=${this.userId}&date=${this.selectedDate}`).subscribe(
       (data) => {
         this.activityData = data;
+        this.isActivityLoading = false;
         this.updateCalorieStats();
+        this.updateLoadingState();
       },
       (error) => {
         console.error('Failed to fetch activity data:', error);
+        this.isActivityLoading = false;
+        this.updateLoadingState();
       }
     );
+  }
+
+  updateLoadingState(): void {
+    this.isLoading = this.isFoodLoading || this.isActivityLoading;
   }
 
   updateCalorieStats(): void {
@@ -132,9 +151,5 @@ export class UserDetailsComponentComponent implements OnInit {
     this.selectedDate = event.target.value;
     this.fetchFoodData();
     this.fetchActivityData();
-  }
-
-  loadCalorieData(): void {
-    this.isLoading = false;
   }
 }

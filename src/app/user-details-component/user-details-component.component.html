@@ -2,27 +2,26 @@
 
 <div class="d-flex flex-column min-vh-100">
   <!-- Success Alert -->
-  <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
-       role="alert" *ngIf="showSuccessAlert" style="z-index: 9999; max-width: 500px;">
+  <div *ngIf="showSuccessAlert" class="alert alert-success m-3 mx-auto" role="alert">
     {{ successMessage }}
-    <button type="button" class="btn-close" (click)="showSuccessAlert = false" aria-label="Close"></button>
   </div>
 
   <div class="container mt-4 flex-grow-1">
     <div class="row mb-4">
       <div class="col-md-6">
         <div class="d-flex align-items-center">
-          <h2 class="text-primary mb-0">{{ userName }}</h2>
+          <h2 class="text-primary mb-0">{{userName}}</h2>
+          <span class="ms-3 badge bg-info">BMR: {{userBmr || 0}}</span>
         </div>
       </div>
       <div class="col-md-6 text-end">
-        <button class="btn btn-primary" (click)="addData()">Add Food and Activity Data</button>
+        <button class="btn btn-primary" (click)="addData()">Add Data</button>
       </div>
     </div>
 
-    <!-- Date Selection -->
+    <hr>
     <div class="row mb-4">
-      <div class="col-md-6">
+      <div class="col-md-6 ms-auto">
         <div class="input-group">
           <input type="date" class="form-control" placeholder="dd/MM/yyyy" (change)="onDateChange($event)">
         </div>
@@ -38,7 +37,14 @@
             <h5 class="card-title mb-0">Food Data</h5>
           </div>
           <div class="card-body p-0">
-            <div class="table-responsive">
+            <!-- Loading Spinner for Food Data -->
+            <div *ngIf="isFoodLoading" class="d-flex justify-content-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <!-- Food Data Table -->
+            <div class="table-responsive" *ngIf="!isFoodLoading">
               <table class="table table-striped mb-0">
                 <thead class="table-light">
                   <tr>
@@ -74,7 +80,14 @@
             <h5 class="card-title mb-0">Activity Data</h5>
           </div>
           <div class="card-body p-0">
-            <div class="table-responsive">
+            <!-- Loading Spinner for Activity Data -->
+            <div *ngIf="isActivityLoading" class="d-flex justify-content-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+            <!-- Activity Data Table -->
+            <div class="table-responsive" *ngIf="!isActivityLoading">
               <table class="table table-striped mb-0">
                 <thead class="table-light">
                   <tr>
@@ -114,36 +127,45 @@
             <h5 class="card-title mb-0">Net Calorie</h5>
           </div>
           <div class="card-body">
-            <div class="row border-bottom py-2">
-              <div class="col-6">
-                <strong>BMR:</strong>
-              </div>
-              <div class="col-6 text-end">
-                {{ calorieStats.bmr }}
+            <!-- Loading Spinner for Net Calorie -->
+            <div *ngIf="isLoading" class="d-flex justify-content-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
               </div>
             </div>
-            <div class="row border-bottom py-2">
-              <div class="col-6">
-                <strong>Food:</strong>
+            <!-- Net Calorie Data -->
+            <div *ngIf="!isLoading">
+              <div class="row border-bottom py-2">
+                <div class="col-6">
+                  <strong>BMR:</strong>
+                </div>
+                <div class="col-6 text-end">
+                  {{ calorieStats.bmr }}
+                </div>
               </div>
-              <div class="col-6 text-end">
-                +{{ calorieStats.food }}
+              <div class="row border-bottom py-2">
+                <div class="col-6">
+                  <strong>Food:</strong>
+                </div>
+                <div class="col-6 text-end">
+                  +{{ calorieStats.food }}
+                </div>
               </div>
-            </div>
-            <div class="row border-bottom py-2">
-              <div class="col-6">
-                <strong>Activity:</strong>
+              <div class="row border-bottom py-2">
+                <div class="col-6">
+                  <strong>Activity:</strong>
+                </div>
+                <div class="col-6 text-end">
+                  {{ calorieStats.activity }}
+                </div>
               </div>
-              <div class="col-6 text-end">
-                {{ calorieStats.activity }}
-              </div>
-            </div>
-            <div class="row py-2 bg-secondary text-white">
-              <div class="col-6">
-                <strong>Net Calorie:</strong>
-              </div>
-              <div class="col-6 text-end">
-                {{ calorieStats.netCalorie }}
+              <div class="row py-2 bg-secondary text-white">
+                <div class="col-6">
+                  <strong>Net Calorie:</strong>
+                </div>
+                <div class="col-6 text-end">
+                  {{ calorieStats.netCalorie }}
+                </div>
               </div>
             </div>
           </div>

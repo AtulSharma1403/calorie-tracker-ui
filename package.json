@@ -4,8 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "build:github-pages": "ng build --base-href=/deploy-calorie-tracker-to-github/",
+    "build": "ng build --base-href /calorie-tracker/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

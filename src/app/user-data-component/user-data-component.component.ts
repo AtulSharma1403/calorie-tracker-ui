@@ -24,7 +24,7 @@ interface CalorieEntry {
 })
 export class UserDataComponentComponent implements OnInit {
   userId: string = '';
-  userName: string = 'James';
+  userName: string = '';
   selectedDate: string = '';
   calorieData: CalorieEntry[] = [];
   filteredEntry: CalorieEntry | null = null;

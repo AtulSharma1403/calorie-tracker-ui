@@ -14,6 +14,17 @@ export class FoodActivityModalComponent implements OnInit {
   foods: any[] = [];
   foodNames: any[] = [];
   allFoodNames: any[] = [];
+  maxDate: string = '';
+  minDate: string = '';
+  
+  // Alert properties
+  alertMessage: string = '';
+  showAlert: boolean = false;
+  alertType: 'success' | 'danger' | 'warning' | 'info' = 'danger';
+
+  // Validation properties
+  formErrors: {[key: string]: boolean} = {};
+  submitted: boolean = false;
   
   @Input() userId: string = '';
   @Input() set show(value: boolean) {
@@ -65,7 +76,7 @@ export class FoodActivityModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('https://calorie-tracker-bff.onrender.com/api/activities').subscribe(
+    this.http.get<any[]>(`${this.apiUrl}/activities`).subscribe(
       (data: any[]) => {
         this.activities = data;
       },
@@ -73,7 +84,7 @@ export class FoodActivityModalComponent implements OnInit {
         console.error('Failed to fetch activities:', error);
       }
     );
-    this.http.get<any[]>('https://calorie-tracker-bff.onrender.com/api/foods/groups').subscribe(
+    this.http.get<any[]>(`${this.apiUrl}/foods/groups`).subscribe(
       (data: any[]) => {
         this.foods = data;
       },
@@ -81,24 +92,109 @@ export class FoodActivityModalComponent implements OnInit {
         console.error('Failed to fetch food groups:', error);
       }
     );
-  
+    
+    // Set date constraints to last 30 days
+    this.setDateConstraints();
   }
   
   closeModal(): void {
     this.close.emit();
   }
   
+  // Display alert message
+  showAlertMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info' = 'danger'): void {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      this.showAlert = false;
+    }, 3000);
+  }
+
+  // Validate food form fields
+  validateFoodForm(): boolean {
+    this.formErrors = {};
+    this.submitted = true;
+    
+    let isValid = true;
+    
+    if (!this.foodData.date) {
+      this.formErrors['foodDate'] = true;
+      isValid = false;
+    }
+    
+    if (!this.foodData.foodGroup) {
+      this.formErrors['foodGroup'] = true;
+      isValid = false;
+    }
+    
+    if (!this.foodData.foodName) {
+      this.formErrors['foodName'] = true;
+      isValid = false;
+    }
+    
+    if (!this.foodData.mealType) {
+      this.formErrors['mealType'] = true;
+      isValid = false;
+    }
+    
+    if (!this.foodData.serving) {
+      this.formErrors['serving'] = true;
+      isValid = false;
+    }
+    
+    return isValid;
+  }
+  
+  // Validate activity form fields
+  validateActivityForm(): boolean {
+    this.formErrors = {};
+    this.submitted = true;
+    
+    let isValid = true;
+    
+    if (!this.activityData.date) {
+      this.formErrors['activityDate'] = true;
+      isValid = false;
+    }
+    
+    if (!this.activityData.activityName) {
+      this.formErrors['activityName'] = true;
+      isValid = false;
+    }
+    
+    if (!this.activityData.specificMotion) {
+      this.formErrors['specificMotion'] = true;
+      isValid = false;
+    }
+    
+    if (!this.activityData.metValue) {
+      this.formErrors['metValue'] = true;
+      isValid = false;
+    }
+    
+    const hours = parseInt(this.activityData.durationHours) || 0;
+    const minutes = parseInt(this.activityData.durationMinutes) || 0;
+    
+    if (hours === 0 && minutes === 0) {
+      this.formErrors['durationRequired'] = true;
+      isValid = false;
+    }
+    
+    return isValid;
+  }
+  
   saveFood(): void {
-    // Validate required fields
-    if (!this.foodData.foodName || !this.foodData.mealType) {
-      alert('Please fill in all required fields.');
+    if (!this.validateFoodForm()) {
+      this.showAlertMessage('Please fill in all required fields.', 'danger');
       return;
     }
     
-    // Validate userId
     if (!this.userId) {
       console.error('No user selected');
-      alert('No user selected. Please select a user before saving data.');
+      this.showAlertMessage('No user selected. Please select a user before saving data.', 'danger');
       return;
     }
     
@@ -111,34 +207,26 @@ export class FoodActivityModalComponent implements OnInit {
       },
       (error) => {
         console.error('Failed to save food data:', error);
-        alert('Failed to save food data. Please try again.');
+        this.showAlertMessage('Failed to save food data. Please try again.', 'danger');
       }
     );
   }
   
   saveActivity(): void {
-    // Validate required fields
-    if (!this.activityData.activityName || !this.activityData.specificMotion || !this.activityData.metValue) {
-      alert('Please fill in all required fields.');
-      return;
-    }
-    
-    // Check if duration is provided
-    const hours = parseInt(this.activityData.durationHours) || 0;
-    const minutes = parseInt(this.activityData.durationMinutes) || 0;
-    
-    if (hours === 0 && minutes === 0) {
-      alert('Please specify activity duration.');
+    if (!this.validateActivityForm()) {
+      this.showAlertMessage('Please fill in all required fields.', 'danger');
       return;
     }
     
     // Validate userId
     if (!this.userId) {
       console.error('No user selected');
-      alert('No user selected. Please select a user before saving data.');
+      this.showAlertMessage('No user selected. Please select a user before saving data.', 'danger');
       return;
     }
     
+    const hours = parseInt(this.activityData.durationHours) || 0;
+    const minutes = parseInt(this.activityData.durationMinutes) || 0;
     const totalMinutes = (hours * 60) + minutes;
     
     // Create a copy of the activity data with duration in the format expected by the API
@@ -160,18 +248,20 @@ export class FoodActivityModalComponent implements OnInit {
       },
       (error) => {
         console.error('Failed to save activity data:', error);
-        alert('Failed to save activity data. Please try again.');
+        this.showAlertMessage('Failed to save activity data. Please try again.', 'danger');
       }
     );
   }
   
   setActiveTab(tab: 'food' | 'activity'): void {
     this.activeTab = tab;
+    this.submitted = false;
+    this.formErrors = {};
   }
 
   onActivityChange(): void {
     if (this.activityData.activityName) {
-      this.http.get<any[]>(`https://calorie-tracker-bff.onrender.com/api/activities/${this.activityData.activityName}`).subscribe(
+      this.http.get<any[]>(`${this.apiUrl}/activities/${this.activityData.activityName}`).subscribe(
         (data: any[]) => {
           this.specificMotions = data;
           this.activityData.specificMotion = '';
@@ -186,7 +276,7 @@ export class FoodActivityModalComponent implements OnInit {
 
   onSpecificMotionChange(): void {
     if (this.activityData.specificMotion) {
-      const selectedMotion = this.specificMotions.find(motion => motion['SPECIFIC MOTION'] === this.activityData.specificMotion);
+      const selectedMotion = this.specificMotions.find(motion => motion['SPECIFIC_MOTION'] === this.activityData.specificMotion);
       if (selectedMotion) {
         this.activityData.metValue = selectedMotion.METs || '';
       }
@@ -199,6 +289,19 @@ export class FoodActivityModalComponent implements OnInit {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  setDateConstraints(): void {
+    // Set max date to today
+    this.maxDate = this.getCurrentDate();
+    
+    // Set min date to 30 days ago
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const year = thirtyDaysAgo.getFullYear();
+    const month = String(thirtyDaysAgo.getMonth() + 1).padStart(2, '0');
+    const day = String(thirtyDaysAgo.getDate()).padStart(2, '0');
+    this.minDate = `${year}-${month}-${day}`;
   }
 
   resetForm(): void {
@@ -225,13 +328,17 @@ export class FoodActivityModalComponent implements OnInit {
     // Reset food names to show all options
     this.foodNames = this.allFoodNames;
     
+    // Reset validation state
+    this.submitted = false;
+    this.formErrors = {};
+    
     // Set default active tab
     this.activeTab = 'food';
   }
 
   onFoodGroupChange(): void {
     if (this.foodData.foodGroup) {
-      this.http.get<any[]>(`https://calorie-tracker-bff.onrender.com/api/foods/group/${this.foodData.foodGroup}`).subscribe(
+      this.http.get<any[]>(`${this.apiUrl}/foods/group/${this.foodData.foodGroup}`).subscribe(
         (data: any[]) => {
           this.foodNames = data;
           // Reset food name when group changes
@@ -239,7 +346,7 @@ export class FoodActivityModalComponent implements OnInit {
         },
         (error) => {
           console.error('Failed to fetch foods by group:', error);
-          // If API call fails, reset to empty array
+          // Reset to empty array
           this.foodNames = [];
           this.foodData.foodName = '';
         }

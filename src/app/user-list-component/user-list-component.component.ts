@@ -25,6 +25,7 @@ export class UserListComponentComponent implements OnInit {
   selectedMotion: any = null;
   showSuccessAlert: boolean = false;
   successMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private http: HttpClient, 
@@ -32,13 +33,15 @@ export class UserListComponentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.http.get<any[]>('https://calorie-tracker-bff.onrender.com/api/users').subscribe(
       (data) => {
-        debugger
         this.users = data;
+        this.isLoading = false;
       },
       (error) => {
         console.error('Failed to fetch users:', error);
+        this.isLoading = false;
       }
     );
 
